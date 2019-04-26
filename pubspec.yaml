@@ -1,7 +1,7 @@
 name: flutter_network_file_manager
-description: A new flutter plugin project.
+description: A manager to use networkfiles offline.
 version: 0.0.1
-author:
+author: Paul Schunck
 homepage:
 
 environment:
