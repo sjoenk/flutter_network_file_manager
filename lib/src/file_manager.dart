@@ -38,7 +38,6 @@ abstract class BaseFileManager {
   Future<String> _fileBasePath;
 
   final String _storeKey;
-  Duration _maxAgeFileObject;
 
   /// This path is used as base folder for all saved files.
   Future<String> getFilePath();
