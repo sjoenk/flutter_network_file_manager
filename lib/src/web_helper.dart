@@ -111,7 +111,9 @@ class WebHelper {
   }
 
   Future<bool> _handleHttpResponse(
-      FileFetcherResponse response, FileObject fileObject) async {
+    FileFetcherResponse response,
+    FileObject fileObject,
+  ) async {
     if (response.statusCode == 200) {
       var basePath = await _store.filePath;
       _setDataFromHeaders(fileObject, response);
@@ -132,7 +134,9 @@ class WebHelper {
   }
 
   _setDataFromHeaders(
-      FileObject fileObject, FileFetcherResponse response) async {
+    FileObject fileObject,
+    FileFetcherResponse response,
+  ) async {
     //Without a cache-control header we keep the file for a week
     var ageDuration = Duration(days: 7);
 
