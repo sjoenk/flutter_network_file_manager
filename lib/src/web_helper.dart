@@ -77,7 +77,7 @@ class WebHelper {
       }
 
       if (fileObject.eTag != null) {
-        headers["If-None-Match"] = fileObject.eTag;
+        headers[HttpHeaders.ifNoneMatchHeader] = fileObject.eTag;
       }
 
       var success = false;
@@ -86,7 +86,8 @@ class WebHelper {
       success = await _handleHttpResponse(response, fileObject);
 
       if (!success) {
-        throw HttpException("No valid statuscode. Statuscode was ${response?.statusCode}");
+        throw HttpException(
+            "No valid statuscode. Statuscode was ${response?.statusCode}");
       }
 
       _store.putFile(fileObject);
@@ -103,12 +104,14 @@ class WebHelper {
     });
   }
 
-  Future<FileFetcherResponse> _defaultHttpGetter(String url, {Map<String, String> headers}) async {
+  Future<FileFetcherResponse> _defaultHttpGetter(String url,
+      {Map<String, String> headers}) async {
     var httpResponse = await http.get(url, headers: headers);
     return HttpFileFetcherResponse(httpResponse);
   }
 
-  Future<bool> _handleHttpResponse(FileFetcherResponse response, FileObject fileObject) async {
+  Future<bool> _handleHttpResponse(
+      FileFetcherResponse response, FileObject fileObject) async {
     if (response.statusCode == 200) {
       var basePath = await _store.filePath;
       _setDataFromHeaders(fileObject, response);
@@ -128,16 +131,19 @@ class WebHelper {
     return false;
   }
 
-  _setDataFromHeaders(FileObject fileObject, FileFetcherResponse response) async {
+  _setDataFromHeaders(
+      FileObject fileObject, FileFetcherResponse response) async {
     //Without a cache-control header we keep the file for a week
     var ageDuration = Duration(days: 7);
 
-    if (response.hasHeader("cache-control")) {
-      var cacheControl = response.header("cache-control");
+    if (response.hasHeader(HttpHeaders.cacheControlHeader)) {
+      var cacheControl = response.header(HttpHeaders.cacheControlHeader);
       var controlSettings = cacheControl.split(", ");
+
       controlSettings.forEach((setting) {
         if (setting.startsWith("max-age=")) {
           var validSeconds = int.tryParse(setting.split("=")[1]) ?? 0;
+
           if (validSeconds > 0) {
             ageDuration = Duration(seconds: validSeconds);
           }
@@ -147,13 +153,14 @@ class WebHelper {
 
     fileObject.touchedAt = DateTime.now().add(ageDuration);
 
-    if (response.hasHeader("etag")) {
-      fileObject.eTag = response.header("etag");
+    if (response.hasHeader(HttpHeaders.etagHeader)) {
+      fileObject.eTag = response.header(HttpHeaders.etagHeader);
     }
 
     var fileExtension = "";
-    if (response.hasHeader("content-type")) {
-      var type = response.header("content-type").split("/");
+
+    if (response.hasHeader(HttpHeaders.contentTypeHeader)) {
+      var type = response.header(HttpHeaders.contentTypeHeader).split("/");
       if (type.length == 2) {
         fileExtension = ".${type[1]}";
       }
