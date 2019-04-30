@@ -58,14 +58,18 @@ abstract class BaseFileManager {
   }
 
   Future<File> getSingleFile({
-    @required String name,
-    @required String url,
+    String name,
+    String url,
     DateTime timestamp,
     Map<String, String> headers,
   }) async {
+    if (name == null) {
+      name = url;
+    }
+
     var storageFile = await getFileFromStorage(name);
     if (storageFile != null) {
-      if (storageFile.timestamp.isBefore(timestamp) || storageFile.originalUrl != url) {
+      if ((timestamp != null && storageFile.timestamp.isBefore(timestamp)) || storageFile.originalUrl != url) {
         webHelper.downloadFile(
           name: name,
           url: url,
@@ -75,6 +79,7 @@ abstract class BaseFileManager {
       }
       return storageFile.file;
     }
+
     try {
       var download = await webHelper.downloadFile(
         name: name,
@@ -89,17 +94,23 @@ abstract class BaseFileManager {
   }
 
   Stream<FileInfo> getFile({
-    @required String name,
-    @required String url,
+    String name,
+    String url,
     DateTime timestamp,
     bool force = false,
     Map<String, String> headers,
   }) async* {
+    if (name == null) {
+      name = url;
+    }
+
     FileInfo storageFile = await getFileFromStorage(name);
     if (storageFile != null) {
       yield storageFile;
     }
-    if (storageFile == null || storageFile.timestamp.isBefore(timestamp) || storageFile.originalUrl != url) {
+    if (storageFile == null ||
+        (timestamp != null && storageFile.timestamp.isBefore(timestamp)) ||
+        storageFile.originalUrl != url) {
       try {
         FileInfo webFile = await webHelper.downloadFile(
           name: name,
