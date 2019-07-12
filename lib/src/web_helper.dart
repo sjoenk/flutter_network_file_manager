@@ -86,8 +86,7 @@ class WebHelper {
       success = await _handleHttpResponse(response, fileObject);
 
       if (!success) {
-        throw HttpException(
-            "No valid statuscode. Statuscode was ${response?.statusCode}");
+        throw HttpException("No valid statuscode. Statuscode was ${response?.statusCode}");
       }
 
       _store.putFile(fileObject);
@@ -104,8 +103,7 @@ class WebHelper {
     });
   }
 
-  Future<FileFetcherResponse> _defaultHttpGetter(String url,
-      {Map<String, String> headers}) async {
+  Future<FileFetcherResponse> _defaultHttpGetter(String url, {Map<String, String> headers}) async {
     var httpResponse = await http.get(url, headers: headers);
     return HttpFileFetcherResponse(httpResponse);
   }
@@ -177,7 +175,7 @@ class WebHelper {
     }
 
     if (fileObject.relativePath == null) {
-      fileObject.relativePath = "${Uuid().v1()}$fileExtension";
+      fileObject.relativePath = fileObject.name ?? "${Uuid().v1()}$fileExtension";
     }
   }
 
